@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  unleash-edge:
+    image: unleashorg/unleash-edge:v16.0.6
+    ports:
+      - "3063:3063"
+    environment:
+      - UPSTREAM_URL=https://app.unleash-hosted.com/demo
+      - TOKENS=*:development.fe85ff03d100f6dbee93b4925ed39209c072ed999243dd5d6d3894cd
+      - WORKERS=1
+    command:
+      - edge
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+  unleash-proxy:
+    image: unleashorg/unleash-proxy:v1.0.0
+    environment:
+      - UNLEASH_PROXY_SECRETS=proxybenchmark
+      - UNLEASH_URL=https://app.unleash-hosted.com/demo/api
+      - UNLEASH_API_TOKEN=*:development.fe85ff03d100f6dbee93b4925ed39209c072ed999243dd5d6d3894cd
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1G"
+  curl:
+    image: quay.io/curl/curl:latest
+    command: 'curl -s -o /dev/null -H "Authorization: *:development.531d0f514a4c480d6508512c2bc69ce8b595e1cf3a00d18978edac6a" -w "%{http_code}" http://unleash-edge:3063/api/frontend'
+    depends_on:
+      - unleash-edge
+  k6edge:
+    image: grafana/k6
+    volumes:
+      - ./edgebenchmark.js:/k6script.js
+      - ./k6data:/k6data
+    command: run /k6script.js
+    depends_on:
+      - unleash-edge
+      - curl
+  k6proxy:
+    image: grafana/k6
+    volumes:
+      - ./proxybenchmark.js:/k6script.js
+      - ./k6data:/k6data
+    command: run /k6script.js
+    depends_on:
+      - unleash-proxy
