@@ -24,6 +24,7 @@ services:
       - DATABASE_URL=postgres://unleash_user:password@postgres:5432/unleash
       - DATABASE_SSL=false
       - INIT_CLIENT_API_TOKENS=*:development.somerandomstring
+      - INIT_ADMIN_API_TOKENS=*:*.admintoken
     deploy:
       resources:
         limits:
