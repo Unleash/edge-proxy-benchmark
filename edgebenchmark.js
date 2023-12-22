@@ -18,12 +18,12 @@ export let options = {
 const EDGE_BASE_URL = 'http://unleash-edge:3063';
 
 export default function () {
-    let r = http.get(`${EDGE_BASE_URL}/api/frontend`, { tags: { name: 'EdgeFrontend' }, group: 'Edge', headers: { 'Authorization': '*:development.531d0f514a4c480d6508512c2bc69ce8b595e1cf3a00d18978edac6a' } });
+    let r = http.get(`${EDGE_BASE_URL}/api/frontend`, { tags: { name: 'EdgeFrontend' }, group: 'Edge', headers: { 'Authorization': '*:development.fcafb6fc390a0954a226b30830f996c0d531393c831feafdafdf38e6' } });
     check(r, { 'Edge Client Features status was 200': (r) => r.status === 200 });
 }
 
 export function handleSummary(data) {
-    return {
-        "/k6data/edge_summary.html": htmlReport(data),
-    }
+  return {
+    '/k6data/edge_benchmark.html': htmlReport(data)
+  }
 }

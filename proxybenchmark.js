@@ -23,7 +23,7 @@ export default function () {
 }
 
 export function handleSummary(data) {
-    return {
-        "/k6data/proxy_summary.html": htmlReport(data),
-    }
+  return {
+    '/k6data/proxy_benchmark.html': htmlReport(data)
+  }
 }

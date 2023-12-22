@@ -1,13 +1,41 @@
 version: "3.9"
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=unleash_user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=unleash
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+  unleash:
+    image: unleashorg/unleash-server:5.7.1
+    ports:
+      - "4243:4242"
+    depends_on:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://unleash_user:password@postgres:5432/unleash
+      - DATABASE_SSL=false
+      - INIT_CLIENT_API_TOKENS=*:development.somerandomstring
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1G"
   unleash-edge:
     image: unleashorg/unleash-edge:v16.0.6
     ports:
       - "3063:3063"
     environment:
-      - UPSTREAM_URL=https://app.unleash-hosted.com/demo
-      - TOKENS=*:development.fe85ff03d100f6dbee93b4925ed39209c072ed999243dd5d6d3894cd
+      - UPSTREAM_URL=http://unleash:4242
+      - TOKENS=*:development.somerandomstring
       - WORKERS=1
     command:
       - edge
@@ -16,12 +44,14 @@ services:
         limits:
           cpus: "1"
           memory: 1G
+    depends_on:
+      - unleash
   unleash-proxy:
-    image: unleashorg/unleash-proxy:v1.0.0
+    image: unleashorg/unleash-proxy:v1.0.1
     environment:
       - UNLEASH_PROXY_SECRETS=proxybenchmark
-      - UNLEASH_URL=https://app.unleash-hosted.com/demo/api
-      - UNLEASH_API_TOKEN=*:development.fe85ff03d100f6dbee93b4925ed39209c072ed999243dd5d6d3894cd
+      - UNLEASH_URL=http://unleash:4242/api
+      - UNLEASH_API_TOKEN=*:development.somerandomstring
     ports:
       - "3000:3000"
     deploy:
@@ -29,6 +59,8 @@ services:
         limits:
           cpus: "1"
           memory: "1G"
+    depends_on:
+      - unleash
   curl:
     image: quay.io/curl/curl:latest
     command: 'curl -s -o /dev/null -H "Authorization: *:development.531d0f514a4c480d6508512c2bc69ce8b595e1cf3a00d18978edac6a" -w "%{http_code}" http://unleash-edge:3063/api/frontend'
