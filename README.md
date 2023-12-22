@@ -13,7 +13,7 @@ docker compose up unleash
 2. Load with data. If you're on linux, the `unleash-datagenerator` binary available can do the job for you. If on mac or windows, https://github.com/chriswk/unleash-datagenerator and build for your platform
 
 ```bash
-./unleash-datagenerator -a "*:*.admintoken" -c <NUMBER_OF_FEATURES> -s <NUMBER_OF_STRATEGIES_PER_FEATURE> -u http://localhost:4342
+./unleash-datagenerator -a "*:*.admintoken" -c <NUMBER_OF_FEATURES> -s <NUMBER_OF_STRATEGIES_PER_FEATURE> -u http://localhost:4243
 ```
 
 3. Create a frontend token, username and password for logging in to http://localhost:4243 is `username: admin password: unleash4all`
